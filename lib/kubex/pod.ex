@@ -1,6 +1,7 @@
 defmodule Kubex.Pod do
 
   alias Kubex.Utils
+  alias Kubex.Table
 
   @moduledoc """
     Pod definition and pod utilities
@@ -45,11 +46,13 @@ defmodule Kubex.Pod do
   def print_pods_nicely(pods) do
     pods
     |> Enum.map(&print_pod/1)
+    |> Table.format(padding: 2)
+    |> IO.puts
   end
 
   @spec print_pod(%Pod{}) :: String.t
   def print_pod(pod) do
-    IO.inspect "#{pod.name} #{pod.namespace} #{pod.node} #{pod.cpu} #{pod.memory}"
+    ["#{pod.name}", "#{pod.namespace}", "#{pod.node}", "#{pod.cpu}", "#{pod.memory}"]
   end
 
   @doc """

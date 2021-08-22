@@ -12,6 +12,7 @@ defmodule Kubex.KubeCTL do
     |> Pod.serialize_pods
     |> Pod.sort_pods(opts)
     |> Enum.map(&add_node_to_pod/1)
+    |> Pod.add_field_names
     |> Pod.print_pods_nicely
   end
 

@@ -42,6 +42,14 @@ defmodule Kubex.Pod do
   @doc """
     Print [%Pod{}] nicely on the shell
   """
+  @spec add_field_names([%Pod{}]) :: list
+  def add_field_names(pods) do
+    [["POD", "WORKLOAD", "NODE", "CPU", "MEMORY"] | pods]
+  end
+
+  @doc """
+    Print [%Pod{}] nicely on the shell
+  """
   @spec print_pods_nicely([%Pod{}]) :: [%Pod{}]
   def print_pods_nicely(pods) do
     pods
@@ -50,10 +58,16 @@ defmodule Kubex.Pod do
     |> IO.puts
   end
 
+  @spec print_pod(String.t) :: String.t
+  def print_pod(pod) when is_binary(pod), do: pod
+
   @spec print_pod(%Pod{}) :: String.t
-  def print_pod(pod) do
+  def print_pod(pod) when is_map(pod) do
     ["#{pod.name}", "#{pod.namespace}", "#{pod.node}", "#{pod.cpu}", "#{pod.memory}"]
   end
+
+  @spec print_pod(list) :: list
+  def print_pod(pod) when is_list(pod), do: pod
 
   @doc """
     Sort [%Pod{}] per field (cpu and memory for now)

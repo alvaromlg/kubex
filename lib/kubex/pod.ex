@@ -2,6 +2,7 @@ defmodule Kubex.Pod do
 
   alias Kubex.Utils
   alias Kubex.Table
+  alias Kubex.KubeCTL
 
   @moduledoc """
     Pod definition and pod utilities
@@ -21,6 +22,7 @@ defmodule Kubex.Pod do
        |> List.pop_at(-1)
     info
     |> Enum.map(&serialize_pod/1)
+    |> Enum.map(&add_node_to_pod/1)
   end
 
   @doc """
@@ -39,25 +41,6 @@ defmodule Kubex.Pod do
     }
   end
 
-  @doc """
-    Print [%Pod{}] nicely on the shell
-  """
-  @spec add_field_names([%Pod{}]) :: list
-  def add_field_names(pods) do
-    [["POD", "WORKLOAD", "NODE", "CPU", "MEMORY"] | pods]
-  end
-
-  @doc """
-    Print [%Pod{}] nicely on the shell
-  """
-  @spec print_pods_nicely([%Pod{}]) :: [%Pod{}]
-  def print_pods_nicely(pods) do
-    pods
-    |> Enum.map(&print_pod/1)
-    |> Table.format(padding: 2)
-    |> IO.puts
-  end
-
   @spec print_pod(String.t) :: String.t
   def print_pod(pod) when is_binary(pod), do: pod
 
@@ -70,6 +53,17 @@ defmodule Kubex.Pod do
   def print_pod(pod) when is_list(pod), do: pod
 
   @doc """
+    Print [%Pod{}] nicely on the shell
+  """
+  @spec format_pods([%Pod{}]) :: [String.t]
+  def format_pods(pods) do
+    [["POD", "WORKLOAD", "NODE", "CPU", "MEMORY"] | pods]
+    |> Enum.map(&print_pod/1)
+    |> Table.format(padding: 2)
+    |> IO.puts
+  end
+
+  @doc """
     Sort [%Pod{}] per field (cpu and memory for now)
   """
   @spec sort_pods([%Pod{}], map()) :: [%Pod{}]
@@ -79,5 +73,14 @@ defmodule Kubex.Pod do
         [sort_by: "memory"] -> Enum.sort_by(pods, &(&1.memory))
     end
   end
+
+  @spec add_node_to_pod([%Pod{}]) :: [%Pod{}]
+  def add_node_to_pod(pod) do
+    pod_info =
+      KubeCTL.run_kubectl_cmd(["get", "pod", pod.name, "-n", pod.namespace, "-o", "json"])
+      |> Utils.decode_cmd_response
+    Map.put(pod, :node, pod_info.spec.nodeName)
+  end
+
 
 end

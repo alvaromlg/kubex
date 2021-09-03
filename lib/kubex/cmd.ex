@@ -12,7 +12,8 @@ defmodule Kubex.CMD do
   def run_command({opts, [cmd], _}) do
     case cmd do
       "help" -> IO.inspect "help"
-      "info" -> Kubex.KubeCTL.get_pods_info(opts)
+      "pods" -> Kubex.KubeCTL.get_pods_info(opts)
+      "services" -> Kubex.KubeCTL.get_svc_info(opts)
     end
   end
 

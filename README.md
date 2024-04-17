@@ -1,5 +1,10 @@
 # Kubex
 
+Install with:
+```elixir
+mix deps.get
+```
+
 Compile with:
 ```elixir
 mix escript.build
